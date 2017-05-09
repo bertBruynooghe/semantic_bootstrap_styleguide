@@ -5,54 +5,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Styleguide</title>
-    <% bootstrap ||= Net::HTTP.get(URI.parse('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')) %>
-
     <!-- The idea is that a precompiled CSS (customized by the brand) is passed to the docgen renderer.
          (can be generated through http://getbootstrap.com/customize/)
          After that, the css is passed through Sass, together with the semantic to atomic sass converter code.
     -->
-
-    <% body_css = <<END
-    body > div {
-      @extend .container;
-    }
-END
-    %>
-    <% alert_css = <<END
-      .alert-success, .alert-info, .alert-warning, .alert-danger{
-        @extend .alert;
-      }
-END
-    %>
-
     <style>
-      <% css =  bootstrap %>
-      <% css += body_css %>
-      <% css += alert_css %>
-
-      <%= Sass.compile(css) %>
+      <% scss =  Net::HTTP.get(URI.parse('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')) %>
+      <% alert_scss= File.read('app/views/styleguide/_alerts.scss') %>
+      <% scss += alert_scss %>
+      <%= Sass.compile(scss) %>
     </style>
   </head>
 
   <body>
-    <div class="container">
-
     <h1>Alerts</h1>
 
-    <% alert_html = <<END
-    <div class="alert-success">
-      <strong>Well done!</strong> You successfully read this important alert message. </div>
-    <div class="alert-info">
-    <strong>Heads up!</strong> This alert needs your attention, but it's not super important. </div>
-    <div class="alert-warning"> <strong>Warning!</strong> Better check yourself, you're not looking too good. </div>
-    <div class="alert-danger"> <strong>Oh snap!</strong> Change a few things up and try submitting again. </div>
-END
-    %>
+    <% alert_html = File.read('app/views/styleguide/_alerts.html.erb')  %>
 
-    <%= raw Net::HTTP.get(URI.parse("http://hilite.me/api?code=#{URI.escape(alert_css)}&lexer=css&linenos=true&style=default")) %>
+    <%= raw Net::HTTP.get(URI.parse("http://hilite.me/api?code=#{URI.escape(alert_scss)}&lexer=css&linenos=true&style=default")) %>
     <%= raw Net::HTTP.get(URI.parse("http://hilite.me/api?code=#{URI.escape(alert_html)}&lexer=html&linenos=true&style=default")) %>
 
     <%= raw alert_html %>
-  </div>
   </body>
 </html>
